@@ -1,5 +1,3 @@
-rm(list = ls())
-install.packages("plotly")
 #graphs
 library(haven)
 library(ggplot2)
@@ -8,17 +6,18 @@ library(plotly)
 
 #load data set from Stata
 dset.crime<-read_dta("stata files/zcbp90.dta")
+dset.crime$Neighborhood_Demographics<-dset.crime$race
 
 #data where race is turned into a factor variable
 dset.race<- within(dset.crime, {
-  race<- factor(race, levels = 0:4, labels = c("white", "black", "hispanic", "minority", "integrated"))
+  Neighborhood_Demographics<- factor(Neighborhood_Demographics, levels = 0:4, labels = c("white", "black", "hispanic", "minority", "integrated"))
 })
 
 #data whre race remains a continuous variable
 dset.norace<- dset.crime
 #create new data set for predicted value graph (interactions)
 newdset.race<- data.frame(religious_organizations= rep(0:51, each=5),
-                          race=rep(c(0:4),52),
+                          Neighborhood_Demographics=rep(c(0:4),52),
                           disadvantage = mean(dset.race$disadvantage),
                           residential_instability =mean(dset.race$residential_instability),
                           race_het =mean(dset.race$race_het))
@@ -33,11 +32,11 @@ newdset.norace<- data.frame(religious_organizations= rep(0:51),
                             race_het =mean(dset.norace$race_het))
 #turn race into a factor variable
 newdset.race <- within(newdset.race, {
-  race<- factor(race, levels = 0:4, labels = c("white", "black", "hispanic", "minority", "integrated"))
+  Neighborhood_Demographics<- factor(Neighborhood_Demographics, levels = 0:4, labels = c("white", "black", "hispanic", "minority", "integrated"))
 })
 #negative binomial model for race
 race.model<-glm.nb(robberies~ disadvantage+ residential_instability+ 
-                     race_het + religious_organizations:race, 
+                     race_het + religious_organizations:Neighborhood_Demographics, 
                    data=dset.race)
 #model for no race
 norace.model<-glm.nb(robberies~ disadvantage+ residential_instability+ 
@@ -52,22 +51,15 @@ newdset.norace$predicted_robberies<- predict(norace.model, newdata = newdset.nor
 
 d<-ggplot() + 
   geom_line(data = newdset.race, aes(x=religious_organizations, 
-                                     y = predicted_robberies, color=race)) +
+                                     y = predicted_robberies, color=Neighborhood_Demographics)) +
   geom_line(data = newdset.norace, aes(x=religious_organizations,
-                                       y = predicted_robberies), size=1.5)+
+                                       y = predicted_robberies, colour="average across all groups"), size=1.75)+
   xlab('Number of Religious Organization') + ylab('Number of Robberies')
 
-
 d
 
-
-d<- ggplot()+
-  geom_line(data = newdset.norace, aes(x=religious_organizations,
-                                         y = predicted_robberies,  
-                                       scale_size_manual(values = 2)))
-
-d
 ggplotly(d)
+
 
 #create plot
 d <- ggplot(newdset.race, aes(religious_organizations, predicted_robberies, color=race))+
