@@ -49,30 +49,17 @@ newdset.race$predicted_robberies<- predict(race.model, newdata = newdset.race, t
 #create column for predicted values (no race)
 newdset.norace$predicted_robberies<- predict(norace.model, newdata = newdset.norace, type = "response")
 
-d<-ggplot() + 
+a<-ggplot() + 
   geom_line(data = newdset.race, aes(x=religious_organizations, 
-                                     y = predicted_robberies, color=Neighborhood_Demographics)) +
+                                     y = predicted_robberies, color=Neighborhood_Demographics)) + 
+  scale_color_discrete(labels=c("average across all groups","predominantly black neighborhood",
+                                "minority neighborhood (but no single group greater than 70%)",
+                                "integrated neighborhood", "predominantly hispanic neighborhood", 
+                                "predominatly white neighborhood"))+
   geom_line(data = newdset.norace, aes(x=religious_organizations,
                                        y = predicted_robberies, colour="average across all groups"), size=1.75)+
-  xlab('Number of Religious Organization') + ylab('Number of Robberies')
+  xlab('Number of Religious Organization') + ylab('Number of Robberies') + ggtitle("Religious Organizations and Robberies")
 
-d
+a
 
-ggplotly(d)
-
-
-
-#create plot
-d <- ggplot(newdset.race, aes(religious_organizations, predicted_robberies, color=race))+
-  geom_line() +xlab('Number of Religious Organization') + ylab('Number of Robberies') +
-  
-
-#create plot
-d <- ggplot(newdset.race, aes(religious_organizations, predicted_robberies, color=race))+
-  geom_line() +xlab('Number of Religious Organization') + ylab('Number of Robberies') +
-
-d
-ggplotly(d)
-
-install.packages("knitr")
-dset.norace$T_pcbl
+ggplotly(a)
