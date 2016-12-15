@@ -61,6 +61,7 @@ d
 ggplotly(d)
 
 
+
 #create plot
 d <- ggplot(newdset.race, aes(religious_organizations, predicted_robberies, color=race))+
   geom_line() +xlab('Number of Religious Organization') + ylab('Number of Robberies') +
@@ -72,4 +73,6 @@ d <- ggplot(newdset.race, aes(religious_organizations, predicted_robberies, colo
 
 d
 ggplotly(d)
+
+install.packages("knitr")
 dset.norace$T_pcbl
